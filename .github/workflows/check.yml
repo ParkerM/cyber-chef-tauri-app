@@ -1,0 +1,24 @@
+name: Check latest CyberChef version
+
+on:
+  schedule:
+    - cron: '21 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  version_check:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.0.2
+        with:
+          token: ${{ secrets.PAT }}
+      - name: Get the latest version of CyberChef
+        run: |
+          curl -s https://api.github.com/repos/gchq/CyberChef/releases/latest | jq -r 'select(.prerelease == false) | .tag_name[1:]' > version
+          export CYBERCHEF_VERSION=$(cat version)
+          echo "CYBERCHEF_VERSION=$CYBERCHEF_VERSION" >> $GITHUB_ENV
+      - name: Add & Commit
+        uses: EndBug/add-and-commit@v9.0.0
+        with:
+          message: 'Version updated to: ${{ env.CYBERCHEF_VERSION }}'
