@@ -29,5 +29,5 @@ jobs:
         with:
           message: 'Version updated to: ${{ env.CYBERCHEF_VERSION }}'
       - name: Debug commit result
-        if: ${{ inputs.debug_enabled }}
+#        if: ${{ inputs.debug_enabled }}
         run: echo '${{ toJSON(steps.commit_version_file.outputs) }}'
