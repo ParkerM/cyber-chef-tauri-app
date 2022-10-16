@@ -1,4 +1,8 @@
 name: Build release
+defaults:
+  run:
+    shell: bash
+
 on:
   workflow_dispatch:
     inputs:
