@@ -58,8 +58,9 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "cyber-chef-tauri-app",
-        "width": 800
+        "title": "CyberChef",
+        "width": 800,
+        "fileDropEnabled": false
       }
     ]
   }
