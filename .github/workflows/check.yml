@@ -65,6 +65,8 @@ jobs:
         uses: ./github/workflows/build.yml
         with:
           version: ${{ needs.version_check.outputs.latest_release_version }}
+          file_name: ${{ needs.version_check.outputs.latest_release_file_name }}
+          download_url: ${{ needs.version_check.outputs.latest_release_download_url }}
 
   debug_outputs:
     if: ${{ always() && inputs.debug_enabled }}
