@@ -13,22 +13,62 @@ on:
 jobs:
   version_check:
     runs-on: ubuntu-20.04
+    outputs:
+      latest_release_tag: ${{ steps.latest_release_info.outputs.tag_name }}
+      latest_release_version: ${{ steps.latest_release_info.outputs.version }}
+      latest_release_file_name: ${{ steps.latest_release_info.outputs.file_name }}
+      latest_release_download_url: ${{ steps.latest_release_info.outputs.download_url }}
+      latest_release_is_new: ${{ steps.compare_version.outputs.version_changed }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3.0.2
         with:
           token: ${{ github.token }}
       - name: Get the latest version of CyberChef
+        id: latest_release_info
         run: |
-          curl -s https://api.github.com/repos/gchq/CyberChef/releases/latest | jq -r 'select(.prerelease == false) | .tag_name[1:]' > version
+          curl -s https://api.github.com/repos/gchq/CyberChef/releases/latest | \
+            jq -c '. |
+               select(.prerelease == false) |
+               {tag_name, version: .tag_name[1:], file_name: .assets[0].name, download_url: .assets[0].browser_download_url} | 
+               to_entries |
+               .[] |
+               "\(.key)::\(.value)"' |
+            xargs -I {} echo "::set-output name={}"
+      - name: Compare with current version and output
+        id: compare_version
+        run: |
           export CYBERCHEF_VERSION=$(cat version)
-          echo "CYBERCHEF_VERSION=$CYBERCHEF_VERSION" >> $GITHUB_ENV
+          echo "${{ steps.latest_release_info.outputs.version }}" | \ 
+            jq 'if .version != $ENV.CYBERCHEF_VERSION then .version else empty end' | \
+            xargs -i -r echo "::set-output name=version_changed::true"
+
+  compare_and_update:
+    needs:
+      - version_check
+    if: ${{ needs.version_check.outputs.latest_release_is_new }}
+    runs-on: ubuntu-20.04
+    steps:
       - name: Add & Commit
         id: commit_version_file
         uses: EndBug/add-and-commit@v9.1.1
         with:
-          message: 'Version updated to: ${{ env.CYBERCHEF_VERSION }}'
+          add: 'version'
+          message: 'Version updated to: ${{ needs.version_check.outputs.latest_release_version }}'
           default_author: github_actions
+
+      - name: Trigger build workflow
+        uses: ./github/workflows/build.yml
+        with:
+          version: ${{ needs.version_check.outputs.latest_release_version }}
+
+  debug_outputs:
+    if: ${{ always() && inputs.debug_enabled }}
+    needs:
+      - version_check
+      - compare_and_update
+    runs-on: ubuntu-20.04
+    steps:
       - name: Debug commit result
-#        if: ${{ inputs.debug_enabled }}
-        run: echo '${{ toJSON(steps.commit_version_file.outputs) }}'
+        run: echo '${{ toJSON(needs) }}'
