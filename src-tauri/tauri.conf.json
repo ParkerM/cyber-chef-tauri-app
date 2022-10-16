@@ -1,7 +1,7 @@
 {
   "build": {
-    "beforeDevCommand": "",
-    "beforeBuildCommand": "sh download_dist.sh",
+    "beforeDevCommand": "sh download_dist.sh",
+    "beforeBuildCommand": "",
     "devPath": "../dist",
     "distDir": "../dist",
     "withGlobalTauri": true
