@@ -39,9 +39,8 @@ jobs:
       - name: Compare with current version and output
         id: compare_version
         run: |
-          export CYBERCHEF_VERSION=$(cat version.json | jq -r '.version')
-          echo "${{ steps.latest_release_info.outputs.version }}" | \ 
-            jq 'if .version != $ENV.CYBERCHEF_VERSION then .version else empty end' | \
+          cat version.json | \
+            jq 'if .version != "${{ steps.latest_release_info.outputs.version }}" then .version else empty end' | \
             xargs -i -r echo "::set-output name=version_changed::true"
 
   compare_and_update:
