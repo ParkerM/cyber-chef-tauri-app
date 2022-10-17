@@ -42,7 +42,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 360
     steps:
-      - uses: actions/checkout@v3.0.2
+      - uses: actions/checkout@v3.1.0
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@1.64
       - name: install dependencies (ubuntu only)
