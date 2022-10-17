@@ -49,7 +49,7 @@ jobs:
     if: ${{ needs.version_check.outputs.latest_release_is_new }}
     runs-on: ubuntu-20.04
     outputs:
-      local_commit_ref: ${{ steps.commit_version_file.outputs.version_changed }}
+      local_commit_ref: ${{ steps.commit_version_file.outputs.commit_long_sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3.1.0
