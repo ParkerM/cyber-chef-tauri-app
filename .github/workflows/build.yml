@@ -63,6 +63,13 @@ jobs:
           mv ./dist/CyberChef_v${{ inputs.version }}.html ./dist/index.html
           rm -rf ./archive/
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build and upload release
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: app-v${{ inputs.version }}
+          releaseName: "App v${{ inputs.version }}"
+          releaseBody: "See the assets to download this version and install."
+          releaseDraft: true
+          prerelease: false
