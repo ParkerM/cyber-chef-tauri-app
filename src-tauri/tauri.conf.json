@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "cyber-chef-tauri-app",
-    "version": "../version.json"
+    "version": "../package.json"
   },
   "tauri": {
     "allowlist": {
