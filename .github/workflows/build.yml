@@ -22,7 +22,7 @@ on:
         description: 'Commit ref to checkout'
         type: string
         required: false
-        default: ${{ github.ref }}
+        default: main
 
   workflow_call:
     inputs:
