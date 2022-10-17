@@ -49,6 +49,8 @@ jobs:
     if: ${{ needs.version_check.outputs.latest_release_is_new }}
     runs-on: ubuntu-20.04
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
       - name: Update version file
         run: |
           echo "{\"version\": \"${{ needs.version_check.outputs.latest_release_version }}\"}" > version.json
