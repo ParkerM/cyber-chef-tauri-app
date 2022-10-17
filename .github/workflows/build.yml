@@ -18,6 +18,11 @@ on:
         description: 'Download URL for release artifact'
         type: string
         required: true
+      local_commit_ref:
+        description: 'Commit ref to checkout'
+        type: string
+        required: false
+        default: ${{ github.ref }}
 
   workflow_call:
     inputs:
@@ -33,6 +38,11 @@ on:
         description: 'Download URL for release artifact'
         type: string
         required: true
+      local_commit_ref:
+        description: 'Commit ref to checkout'
+        type: string
+        required: false
+        default: ${{ github.ref }}
 
 jobs:
   fetch_and_build:
@@ -43,6 +53,8 @@ jobs:
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v3.1.0
+        with:
+          ref: ${{ inputs.local_commit_ref }}
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
       - name: install dependencies (ubuntu only)

@@ -48,6 +48,8 @@ jobs:
       - version_check
     if: ${{ needs.version_check.outputs.latest_release_is_new }}
     runs-on: ubuntu-20.04
+    outputs:
+      local_commit_ref: ${{ steps.commit_version_file.outputs.version_changed }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3.1.0
@@ -72,6 +74,7 @@ jobs:
       version: ${{ needs.version_check.outputs.latest_release_version }}
       file_name: ${{ needs.version_check.outputs.latest_release_file_name }}
       download_url: ${{ needs.version_check.outputs.latest_release_download_url }}
+      local_commit_ref: ${{ needs.compare_and_update.outputs.local_commit_ref }}
 
   debug_outputs:
     if: ${{ always() && inputs.debug_enabled }}
