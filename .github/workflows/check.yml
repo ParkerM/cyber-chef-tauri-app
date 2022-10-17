@@ -62,18 +62,23 @@ jobs:
           message: 'Version updated to: ${{ needs.version_check.outputs.latest_release_version }}'
           default_author: github_actions
 
-      - name: Trigger build workflow
-        uses: ./github/workflows/build.yml
-        with:
-          version: ${{ needs.version_check.outputs.latest_release_version }}
-          file_name: ${{ needs.version_check.outputs.latest_release_file_name }}
-          download_url: ${{ needs.version_check.outputs.latest_release_download_url }}
+  trigger_build_workflow:
+    if: ${{ needs.version_check.outputs.latest_release_is_new }}
+    needs:
+      - version_check
+      - compare_and_update
+    uses: ./github/workflows/build.yml
+    with:
+      version: ${{ needs.version_check.outputs.latest_release_version }}
+      file_name: ${{ needs.version_check.outputs.latest_release_file_name }}
+      download_url: ${{ needs.version_check.outputs.latest_release_download_url }}
 
   debug_outputs:
     if: ${{ always() && inputs.debug_enabled }}
     needs:
       - version_check
       - compare_and_update
+      - trigger_build_workflow
     runs-on: ubuntu-20.04
     steps:
       - name: Debug commit result
