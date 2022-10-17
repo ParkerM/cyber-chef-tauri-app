@@ -67,7 +67,7 @@ jobs:
     needs:
       - version_check
       - compare_and_update
-    uses: ./github/workflows/build.yml
+    uses: ./.github/workflows/build.yml
     with:
       version: ${{ needs.version_check.outputs.latest_release_version }}
       file_name: ${{ needs.version_check.outputs.latest_release_file_name }}
