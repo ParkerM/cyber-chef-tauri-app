@@ -45,7 +45,34 @@ on:
         default: ${{ github.ref }}
 
 jobs:
+  create_release:
+    runs-on: ubuntu-20.04
+    outputs:
+      release_id: ${{ steps.create_release.outputs.result }}
+
+    steps:
+      - name: create release
+        id: create_release
+        uses: actions/github-script@v6
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        with:
+          script: |
+            const { RELEASE_VERSION } = process.env
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `app-v${RELEASE_VERSION}`,
+              name: `CyberChef v${RELEASE_VERSION}`,
+              body: 'Take a look at the assets to download and install this app.',
+              draft: true,
+              prerelease: false
+            })
+            
+            return data.id
+
   fetch_and_build:
+    needs: create_release
     strategy:
       matrix:
         platform: [ ubuntu-20.04, macos-latest, windows-latest ]
@@ -80,8 +107,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: "CyberChef v__VERSION__"
-          releaseBody: "See the assets to download this version and install."
-          releaseDraft: true
-          prerelease: false
+          releaseId: ${{ needs.create_release.outputs.release_id }}
+
+  publish-release:
+    runs-on: ubuntu-20.04
+    needs: [ create_release, fetch_and_build ]
+    steps:
+      - name: publish release
+        id: publish-release
+        uses: actions/github-script@v6
+        env:
+          release_id: ${{ needs.create_release.outputs.release_id }}
+        with:
+          script: |
+            github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: process.env.release_id,
+              draft: false,
+              prerelease: false
+            })
