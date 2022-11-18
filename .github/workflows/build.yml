@@ -7,19 +7,19 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version string for upstream release'
+        description: "Version string for upstream release"
         required: true
         type: string
       file_name:
-        description: 'File name of release artifact'
+        description: "File name of release artifact"
         type: string
         required: true
       download_url:
-        description: 'Download URL for release artifact'
+        description: "Download URL for release artifact"
         type: string
         required: true
       local_commit_ref:
-        description: 'Commit ref to checkout'
+        description: "Commit ref to checkout"
         type: string
         required: false
         default: main
@@ -27,19 +27,19 @@ on:
   workflow_call:
     inputs:
       version:
-        description: 'Version string for upstream release'
+        description: "Version string for upstream release"
         required: true
         type: string
       file_name:
-        description: 'File name of release artifact'
+        description: "File name of release artifact"
         type: string
         required: true
       download_url:
-        description: 'Download URL for release artifact'
+        description: "Download URL for release artifact"
         type: string
         required: true
       local_commit_ref:
-        description: 'Commit ref to checkout'
+        description: "Commit ref to checkout"
         type: string
         required: false
         default: ${{ github.ref }}
@@ -68,14 +68,14 @@ jobs:
               draft: true,
               prerelease: false
             })
-            
+
             return data.id
 
   fetch_and_build:
     needs: create_release
     strategy:
       matrix:
-        platform: [ ubuntu-20.04, macos-latest, windows-latest ]
+        platform: [ubuntu-20.04, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 360
     steps:
@@ -111,7 +111,7 @@ jobs:
 
   publish-release:
     runs-on: ubuntu-20.04
-    needs: [ create_release, fetch_and_build ]
+    needs: [create_release, fetch_and_build]
     steps:
       - name: publish release
         id: publish-release

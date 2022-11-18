@@ -1,1 +1,21 @@
-{"version": "9.49.0"}
+{
+  "name": "cyber-chef-tauri-app-build",
+  "version": "9.49.0",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "lint": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "commander": "^9.4.1",
+    "prettier": "^2.7.1"
+  },
+  "prettier": {
+    "semi": true,
+    "endOfLine": "lf",
+    "trailingComma": "es5"
+  }
+}

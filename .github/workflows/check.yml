@@ -2,7 +2,7 @@ name: Check latest CyberChef version
 
 on:
   schedule:
-    - cron: '21 */6 * * *'
+    - cron: "21 */6 * * *"
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -60,8 +60,8 @@ jobs:
         id: commit_version_file
         uses: EndBug/add-and-commit@v9.1.1
         with:
-          add: 'package.json'
-          message: 'Version updated to: ${{ needs.version_check.outputs.latest_release_version }}'
+          add: "package.json"
+          message: "Version updated to: ${{ needs.version_check.outputs.latest_release_version }}"
           default_author: github_actions
 
   trigger_build_workflow:
