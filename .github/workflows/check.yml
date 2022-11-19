@@ -49,20 +49,26 @@ jobs:
     if: ${{ needs.version_check.outputs.latest_release_is_new }}
     runs-on: ubuntu-20.04
     outputs:
-      local_commit_ref: ${{ steps.commit_version_file.outputs.commit_long_sha }}
+      local_commit_ref: v${{ needs.version_check.outputs.latest_release_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3.1.0
-      - name: Update version file
-        run: |
-          echo "{\"version\": \"${{ needs.version_check.outputs.latest_release_version }}\"}" > package.json
-      - name: Add & Commit
-        id: commit_version_file
-        uses: EndBug/add-and-commit@v9.1.1
+      - uses: actions/setup-node@v3.5.1
         with:
-          add: "package.json"
-          message: "Version updated to: ${{ needs.version_check.outputs.latest_release_version }}"
-          default_author: github_actions
+          node-version: 18.x
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5.2.0
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+      - name: Update version
+        id: commit_version_file
+        run: |
+          npm config set sign-git-commit true
+          npm config set sign-git-tag true
+          npm version ${{ needs.version_check.outputs.latest_release_version }} -m "Version updated to: %s"
+          git push --follow-tags
 
   trigger_build_workflow:
     if: ${{ needs.version_check.outputs.latest_release_is_new }}
