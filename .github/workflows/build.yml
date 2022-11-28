@@ -46,7 +46,7 @@ on:
 
 jobs:
   create_release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       release_id: ${{ steps.create_release.outputs.result }}
 
@@ -75,7 +75,7 @@ jobs:
     needs: create_release
     strategy:
       matrix:
-        platform: [ubuntu-20.04, macos-latest, windows-latest]
+        platform: [ubuntu-22.04, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 360
     steps:
@@ -85,14 +85,10 @@ jobs:
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
       - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-20.04'
+        if: matrix.platform == 'ubuntu-22.04'
         run: |
-          sudo add-apt-repository ppa:savoury1/curl34 -y
           sudo apt-get update
-          sudo apt-get install -y \
-            libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev librsvg2-dev patchelf \
-            curl
-          curl --version
+          sudo apt-get install -y libgtk-3-dev webkit2gtk-4.0 libappindicator3-dev librsvg2-dev patchelf
 
       - name: Download latest artifact
         id: download_dist
@@ -110,7 +106,7 @@ jobs:
           releaseId: ${{ needs.create_release.outputs.release_id }}
 
   publish-release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [create_release, fetch_and_build]
     steps:
       - name: publish release

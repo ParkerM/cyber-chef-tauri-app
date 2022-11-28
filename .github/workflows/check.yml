@@ -12,7 +12,7 @@ on:
 
 jobs:
   version_check:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       latest_release_tag: ${{ steps.latest_release_info.outputs.tag_name }}
       latest_release_version: ${{ steps.latest_release_info.outputs.version }}
@@ -47,7 +47,7 @@ jobs:
     needs:
       - version_check
     if: ${{ needs.version_check.outputs.latest_release_is_new }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       local_commit_ref: v${{ needs.version_check.outputs.latest_release_version }}
     steps:
@@ -88,7 +88,7 @@ jobs:
       - version_check
       - compare_and_update
       - trigger_build_workflow
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Debug commit result
         run: echo '${{ toJSON(needs) }}'
