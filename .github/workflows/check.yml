@@ -39,7 +39,7 @@ jobs:
   compare_local:
     runs-on: ubuntu-22.04
     outputs:
-      update_available: ${{ toJSON(steps.compare_version.outputs.version_changed) }}
+      update_available: ${{ steps.compare_version.outputs.version_changed }}
     needs:
       - get_latest_release
     steps:
