@@ -14,11 +14,10 @@ jobs:
   get_latest_release:
     runs-on: ubuntu-22.04
     outputs:
-      release_tag: ${{ steps.latest_release_info.outputs.tag_name }}
-      release_version: ${{ steps.latest_release_info.outputs.version }}
-      release_file_name: ${{ steps.latest_release_info.outputs.file_name }}
-      release_download_url: ${{ steps.latest_release_info.outputs.download_url }}
-      update_available: ${{ steps.compare_version.outputs.version_changed }}
+      release_tag_name: ${{ steps.extract_props.outputs.tag_name }}
+      release_version: ${{ steps.extract_props.outputs.version }}
+      release_file_name: ${{ steps.extract_props.outputs.file_name }}
+      release_download_url: ${{ steps.extract_props.outputs.download_url }}
 
     steps:
       - name: Checkout
@@ -26,7 +25,7 @@ jobs:
         with:
           token: ${{ github.token }}
       - name: Get the latest version of CyberChef
-        id: latest_release_info
+        id: extract_props
         run: |
           curl -s https://api.github.com/repos/gchq/CyberChef/releases/latest | \
             jq -c '. |
@@ -36,20 +35,34 @@ jobs:
                .[] |
                "\(.key)::\(.value)"' |
             xargs -I {} echo "::set-output name={}"
-      - name: Compare with current version and output
-        id: compare_version
-        run: |
-          cat package.json | \
-            jq 'if .version != "${{ steps.latest_release_info.outputs.version }}" then .version else empty end' | \
-            xargs -i -r echo "::set-output name=version_changed::true"
 
-  compare_and_update:
-    needs:
-      - get_latest_release
-    if: ${{ needs.get_latest_release.outputs.update_available }}
+  compare_local:
     runs-on: ubuntu-22.04
     outputs:
-      local_commit_ref: v${{ needs.get_latest_release.outputs.release_version }}
+      update_available: ${{ toJSON(steps.compare_version.outputs.version_changed) }}
+    needs:
+      - get_latest_release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+        with:
+          token: ${{ github.token }}
+      - name: Check if latest release is newer than local
+        id: compare_version
+        env:
+          RELEASE_VERSION: ${{ needs.get_latest_release.outputs.release_version }}
+        run: |
+          jq 'if .version != env.RELEASE_VERSION then true else false end' package.json | \
+            xargs -i -r echo "version_changed={}" >> $GITHUB_OUTPUT
+
+  update_local:
+    runs-on: ubuntu-22.04
+    if: fromJSON(needs.compare_local.outputs.update_available)
+    outputs:
+      local_commit_ref: ${{ steps.commit_version_file.outputs.version_tag }}
+    needs:
+      - get_latest_release
+      - compare_local
     steps:
       - name: Checkout
         uses: actions/checkout@v3.1.0
@@ -62,32 +75,35 @@ jobs:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.PASSPHRASE }}
           git_user_signingkey: true
-      - name: Update version
+      - name: Update and tag local version
         id: commit_version_file
         run: |
           npm config set sign-git-commit true
           npm config set sign-git-tag true
           npm version ${{ needs.get_latest_release.outputs.release_version }} -m "Version updated to: %s"
           git push --follow-tags
+          echo "version_tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
   trigger_build_workflow:
-    if: ${{ needs.get_latest_release.outputs.update_available }}
+    if: fromJSON(needs.compare_local.outputs.update_available)
     needs:
       - get_latest_release
-      - compare_and_update
+      - compare_local
+      - update_local
     uses: ./.github/workflows/build.yml
     with:
       version: ${{ needs.get_latest_release.outputs.release_version }}
       file_name: ${{ needs.get_latest_release.outputs.release_file_name }}
       download_url: ${{ needs.get_latest_release.outputs.release_download_url }}
-      local_commit_ref: ${{ needs.compare_and_update.outputs.local_commit_ref }}
+      local_commit_ref: ${{ needs.update_local.outputs.local_commit_ref }}
 
   debug_outputs:
-    if: ${{ always() && inputs.debug_enabled }}
+#    if: ${{ always() && inputs.debug_enabled }}
+    if: always() # todo re-enable debug flag
     needs:
       - get_latest_release
-      - compare_and_update
-      - trigger_build_workflow
+      - compare_local
+      - update_local
     runs-on: ubuntu-22.04
     steps:
       - name: Debug commit result
