@@ -11,7 +11,7 @@ on:
         type: boolean
 
 jobs:
-  version_check:
+  get_latest_release:
     runs-on: ubuntu-22.04
     outputs:
       latest_release_tag: ${{ steps.latest_release_info.outputs.tag_name }}
@@ -45,11 +45,11 @@ jobs:
 
   compare_and_update:
     needs:
-      - version_check
-    if: ${{ needs.version_check.outputs.latest_release_is_new }}
+      - get_latest_release
+    if: ${{ needs.get_latest_release.outputs.latest_release_is_new }}
     runs-on: ubuntu-22.04
     outputs:
-      local_commit_ref: v${{ needs.version_check.outputs.latest_release_version }}
+      local_commit_ref: v${{ needs.get_latest_release.outputs.latest_release_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3.1.0
@@ -67,25 +67,25 @@ jobs:
         run: |
           npm config set sign-git-commit true
           npm config set sign-git-tag true
-          npm version ${{ needs.version_check.outputs.latest_release_version }} -m "Version updated to: %s"
+          npm version ${{ needs.get_latest_release.outputs.latest_release_version }} -m "Version updated to: %s"
           git push --follow-tags
 
   trigger_build_workflow:
-    if: ${{ needs.version_check.outputs.latest_release_is_new }}
+    if: ${{ needs.get_latest_release.outputs.latest_release_is_new }}
     needs:
-      - version_check
+      - get_latest_release
       - compare_and_update
     uses: ./.github/workflows/build.yml
     with:
-      version: ${{ needs.version_check.outputs.latest_release_version }}
-      file_name: ${{ needs.version_check.outputs.latest_release_file_name }}
-      download_url: ${{ needs.version_check.outputs.latest_release_download_url }}
+      version: ${{ needs.get_latest_release.outputs.latest_release_version }}
+      file_name: ${{ needs.get_latest_release.outputs.latest_release_file_name }}
+      download_url: ${{ needs.get_latest_release.outputs.latest_release_download_url }}
       local_commit_ref: ${{ needs.compare_and_update.outputs.local_commit_ref }}
 
   debug_outputs:
     if: ${{ always() && inputs.debug_enabled }}
     needs:
-      - version_check
+      - get_latest_release
       - compare_and_update
       - trigger_build_workflow
     runs-on: ubuntu-22.04
