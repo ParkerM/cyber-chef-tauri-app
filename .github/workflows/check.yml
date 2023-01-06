@@ -30,7 +30,7 @@ jobs:
                to_entries |
                .[] |
                "\(.key)=\(.value)"' |
-            xargs -I {} echo "{}" >> $GITHUB_OUTPUT
+            xargs -n 1 echo >> $GITHUB_OUTPUT
 
   compare_local:
     runs-on: ubuntu-22.04
