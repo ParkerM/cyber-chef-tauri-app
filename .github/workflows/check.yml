@@ -106,3 +106,7 @@ jobs:
     steps:
       - name: Debug commit result
         run: echo '${{ toJSON(needs) }}'
+      - name: View context attributes
+        uses: actions/github-script@v6
+        with:
+          script: console.log(context)
