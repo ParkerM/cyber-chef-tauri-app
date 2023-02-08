@@ -20,6 +20,19 @@ jobs:
       release_download_url: ${{ steps.extract_props.outputs.download_url }}
 
     steps:
+      - name: Get release info for the latest version of CyberChef
+        id: latest_release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data } = await github.rest.repos.getLatestRelease({
+              owner: gchq,
+              repo: CyberChef
+            })
+            return data
+      - name: debug echo github script
+        run: echo "${{steps.latest_release.outputs.result}}"
+
       - name: Get the latest version of CyberChef
         id: extract_props
         run: |
