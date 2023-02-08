@@ -36,21 +36,6 @@ jobs:
             Object.entries(outputs).forEach(([k, v]) => core.setOutput(k, v));
             return outputs;
 
-#      - name: debug echo github script
-#        run: echo "${{fromJSON(steps.latest_release.outputs.result)}}"
-#
-#      - name: Get the latest version of CyberChef
-#        id: extract_props
-#        run: |
-#          curl -s https://api.github.com/repos/gchq/CyberChef/releases/latest | \
-#            jq -c '. |
-#               select(.prerelease == false) |
-#               {tag_name, version: .tag_name[1:], file_name: .assets[0].name, download_url: .assets[0].browser_download_url} |
-#               to_entries |
-#               .[] |
-#               "\(.key)=\(.value)"' |
-#            xargs -n 1 echo >> $GITHUB_OUTPUT
-
   compare_local:
     runs-on: ubuntu-22.04
     outputs:
