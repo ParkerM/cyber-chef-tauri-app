@@ -12,7 +12,7 @@ on:
 
 jobs:
   get_latest_release:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       release_tag_name: ${{ steps.release_info.outputs.tag_name }}
       release_version: ${{ steps.release_info.outputs.version }}
@@ -37,7 +37,7 @@ jobs:
             return outputs;
 
   compare_local:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     outputs:
       update_available: ${{ steps.compare_version.outputs.version_changed }}
     needs:
@@ -56,7 +56,7 @@ jobs:
             xargs -i -r echo "version_changed={}" >> $GITHUB_OUTPUT
 
   update_local:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     if: fromJSON(needs.compare_local.outputs.update_available)
     outputs:
       local_commit_ref: ${{ steps.commit_version_file.outputs.version_tag }}
@@ -106,7 +106,7 @@ jobs:
       - get_latest_release
       - compare_local
       - update_local
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Debug commit result
         run: echo '${{ toJSON(needs) }}'
