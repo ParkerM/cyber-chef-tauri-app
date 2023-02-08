@@ -26,8 +26,8 @@ jobs:
         with:
           script: |
             const { data } = await github.rest.repos.getLatestRelease({
-              owner: gchq,
-              repo: CyberChef
+              owner: 'gchq',
+              repo: 'CyberChef'
             })
             return data
       - name: debug echo github script
