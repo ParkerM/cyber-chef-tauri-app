@@ -32,7 +32,9 @@ jobs:
               },
             } = await github.rest.repos.getLatestRelease({ owner: "gchq", repo: "CyberChef" });
             const version = /^v(.+)$/.exec(tag_name)[1] ?? core.setFailed(`Failed to parse version from tag ${tag_name}`);
-            for (const [k, v] of { tag_name, version, description, file_name, download_url }) core.setOutput(k, v);
+            const outputs = { tag_name, version, description, file_name, download_url };
+            Object.entries(outputs).forEach(([k, v]) => core.setOutput(k, v));
+            return outputs;
 
 #      - name: debug echo github script
 #        run: echo "${{fromJSON(steps.latest_release.outputs.result)}}"
