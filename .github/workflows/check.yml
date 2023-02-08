@@ -25,11 +25,14 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const { data } = await github.rest.repos.getLatestRelease({
-              owner: 'gchq',
-              repo: 'CyberChef'
-            })
-            return data
+            const {
+              data: {
+                tag_name: tag_name, body: description, assets: [{ name: file_name, browser_download_url: download_url }]
+              },
+            } = await github.rest.repos.getLatestRelease({ owner: "gchq", repo: "CyberChef" });
+            const version = /^v(.+)$/.exec(tag_name)[1] ?? core.setFailed(`Failed to parse version from tag ${tag_name}`);
+            return { tag_name, version, description, file_name, download_url };
+
       - name: debug echo github script
         run: echo "${{steps.latest_release.outputs.result}}"
 
