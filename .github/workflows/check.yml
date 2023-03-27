@@ -98,6 +98,7 @@ jobs:
       version: ${{ needs.get_latest_release.outputs.release_version }}
       file_name: ${{ needs.get_latest_release.outputs.release_file_name }}
       download_url: ${{ needs.get_latest_release.outputs.release_download_url }}
+      description: ${{ needs.get_latest_release.outputs.release_description }}
       local_commit_ref: ${{ needs.update_local.outputs.local_commit_ref }}
 
   debug_outputs:

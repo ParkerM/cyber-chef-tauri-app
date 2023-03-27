@@ -18,6 +18,11 @@ on:
         description: "Download URL for release artifact"
         type: string
         required: true
+      description:
+        description: "Release notes to add to release body"
+        type: string
+        required: false
+        default: "Take a look at the assets to download and install this app."
       local_commit_ref:
         description: "Commit ref to checkout"
         type: string
@@ -38,6 +43,11 @@ on:
         description: "Download URL for release artifact"
         type: string
         required: true
+      description:
+        description: "Release notes to add to release body"
+        type: string
+        required: false
+        default: "Take a look at the assets to download and install this app."
       local_commit_ref:
         description: "Commit ref to checkout"
         type: string
@@ -56,15 +66,16 @@ jobs:
         uses: actions/github-script@v6
         env:
           RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_DESCRIPTION: ${{ inputs.description }}
         with:
           script: |
-            const { RELEASE_VERSION } = process.env
+            const { RELEASE_VERSION, RELEASE_DESCRIPTION } = process.env
             const { data } = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: `v${RELEASE_VERSION}`,
               name: `CyberChef v${RELEASE_VERSION}`,
-              body: 'Take a look at the assets to download and install this app.',
+              body: RELEASE_DESCRIPTION,
               draft: true,
               prerelease: false
             })
