@@ -117,6 +117,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           releaseId: ${{ needs.create_release.outputs.release_id }}
+          tagName: v${{ inputs.version }}
 
   publish-release:
     runs-on: ubuntu-latest
