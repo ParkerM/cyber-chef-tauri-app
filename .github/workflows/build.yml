@@ -79,7 +79,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 360
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v3
         with:
           ref: ${{ inputs.local_commit_ref }}
       - name: install Rust stable
