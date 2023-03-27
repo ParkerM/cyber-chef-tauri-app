@@ -70,8 +70,8 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
-          cache: 'npm'
+          node-version: "18.x"
+          cache: "npm"
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v5.2.0
         with:
@@ -101,7 +101,7 @@ jobs:
       local_commit_ref: ${{ needs.update_local.outputs.local_commit_ref }}
 
   debug_outputs:
-#    if: ${{ always() && inputs.debug_enabled }}
+    #    if: ${{ always() && inputs.debug_enabled }}
     if: always() # todo re-enable debug flag
     needs:
       - get_latest_release
