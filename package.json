@@ -1,6 +1,6 @@
 {
   "name": "cyber-chef-tauri-app-build",
-  "version": "10.4.0",
+  "version": "10.5.2",
   "private": true,
   "engines": {
     "node": ">=18"
