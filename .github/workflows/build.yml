@@ -63,7 +63,7 @@ jobs:
     steps:
       - name: create release
         id: create_release
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           RELEASE_VERSION: ${{ inputs.version }}
           RELEASE_DESCRIPTION: ${{ inputs.description }}
@@ -90,7 +90,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 360
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.local_commit_ref }}
 
@@ -109,9 +109,9 @@ jobs:
           workspaces: "./src-tauri -> target"
 
       - name: Sync node version and npm cache
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: 20
           cache: "npm"
 
       - name: Download latest artifact
@@ -136,7 +136,7 @@ jobs:
     steps:
       - name: publish release
         id: publish-release
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           release_id: ${{ needs.create_release.outputs.release_id }}
         with:
