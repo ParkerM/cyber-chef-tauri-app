@@ -735,7 +735,7 @@
                       "script": {
                         "x-intellij-language-injection": {
                           "language": "JavaScript",
-                          "prefix": "const github = new (require('octokit')).Octokit({}); "
+                          "prefix": "const github = new (require('@actions/github/lib/utils')).GitHub(); const context = new (require('@actions/github/lib/context')).Context();"
                         }
                       }
                     }

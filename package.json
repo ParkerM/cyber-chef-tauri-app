@@ -10,6 +10,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@actions/github": "^6.0.0",
     "commander": "^11.1.0",
     "prettier": "^3.1.1"
   },
