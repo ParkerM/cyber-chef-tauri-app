@@ -9,6 +9,7 @@ on:
         description: "Set debug flag for manual workflow dispatch"
         required: false
         type: boolean
+        default: false
 
 jobs:
   get_latest_release:
@@ -102,8 +103,7 @@ jobs:
       local_commit_ref: ${{ needs.update_local.outputs.local_commit_ref }}
 
   debug_outputs:
-    #    if: ${{ always() && inputs.debug_enabled }}
-    if: always() # todo re-enable debug flag
+    if: ${{ always() && inputs.debug_enabled }}
     needs:
       - get_latest_release
       - compare_local
